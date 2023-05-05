@@ -121,11 +121,12 @@ impl Command for PickCommand {
             crate::helper::filter(&mut problems, query.to_string());
         }
 
-        let daily_id = if m.contains_id("daily") {
-            Some(cache.get_daily_problem_id().await?)
-        } else {
-            None
-        };
+        let daily_id = None;
+        // let daily_id = if m.contains_id("daily") {
+        //     Some(cache.get_daily_problem_id().await?)
+        // } else {
+        //     None
+        // };
 
         let fid = m
             .get_one::<i32>("id")
