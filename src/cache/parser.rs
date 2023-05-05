@@ -1,18 +1,25 @@
 //! Sub-Module for parsing resp data
 use super::models::*;
 use serde_json::Value;
+use colored::Colorize;
 
 /// problem parser
 pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
     let pairs = v.get("stat_status_pairs")?.as_array()?;
     for p in pairs {
         let stat = p.get("stat")?.as_object()?;
+        let fid_str = stat.get("frontend_question_id")?.as_str()?;
+        let fid = fid_str.parse::<i32>();
+        if fid.is_err() {
+            println!("skip parsing problem {}", fid_str.yellow());
+            continue;
+        }
         let total_acs = stat.get("total_acs")?.as_f64()? as f32;
         let total_submitted = stat.get("total_submitted")?.as_f64()? as f32;
 
         problems.push(Problem {
             category: v.get("category_slug")?.as_str()?.to_string(),
-            fid: stat.get("frontend_question_id")?.as_i64()? as i32,
+            fid : fid.unwrap(),
             id: stat.get("question_id")?.as_i64()? as i32,
             level: p.get("difficulty")?.as_object()?.get("level")?.as_i64()? as i32,
             locked: p.get("paid_only")?.as_bool()?,
