@@ -240,6 +240,8 @@ impl Cache {
         run: Run,
         rfid: i32,
         test_case: Option<String>,
+        file_path: Option<String>,
+        lang: Option<String> 
     ) -> Result<(HashMap<&'static str, String>, [String; 2]), Error> {
         trace!("pre run code...");
         use crate::helper::code_path;
@@ -284,7 +286,8 @@ impl Cache {
             .or(maybe_all_testcases)
             .unwrap_or(d.case);
 
-        File::open(code_path(&p, None)?)?.read_to_string(&mut code)?;
+        let file_path = file_path.unwrap_or(code_path(&p, lang.clone())?);
+        File::open(file_path)?.read_to_string(&mut code)?;
 
         let code = if conf.code.edit_code_marker {
             let begin = code.find(&conf.code.start_marker);
@@ -300,7 +303,7 @@ impl Cache {
             code
         };
 
-        json.insert("lang", conf.code.lang.to_string());
+        json.insert("lang", lang.unwrap_or(conf.code.lang.to_string()));
         json.insert("question_id", p.id.to_string());
         json.insert("typed_code", code);
 
@@ -358,9 +361,11 @@ impl Cache {
         rfid: i32,
         run: Run,
         test_case: Option<String>,
+        file_path: Option<String>,
+        lang: Option<String>,
     ) -> Result<VerifyResult, Error> {
         trace!("Exec problem filter —— Test or Submit");
-        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, test_case).await?;
+        let (json, [url, refer]) = self.pre_run_code(run.clone(), rfid, test_case, file_path, lang).await?;
         trace!("Pre run code result {:?}, {:?}, {:?}", json, url, refer);
 
         let run_res: RunCode = self

@@ -36,6 +36,22 @@ impl Command for ExecCommand {
                     .value_parser(clap::value_parser!(i32))
                     .help("question id"),
             )
+            .arg(
+                Arg::new("file")
+                .short('f')
+                .long("file")
+                .num_args(1)
+                .required(false)
+                .help("custom file to submit")
+                )
+            .arg(
+                Arg::new("lang")
+                .short('l')
+                .long("lang")
+                .num_args(1)
+                .required(false)
+                .help("custom language to set")
+                )
     }
 
     /// `exec` handler
@@ -43,8 +59,10 @@ impl Command for ExecCommand {
         use crate::cache::{Cache, Run};
 
         let id: i32 = *m.get_one::<i32>("id").ok_or(Error::NoneError)?;
+        let file_path = m.get_one::<String>("file").cloned();
+        let lang = m.get_one::<String>("lang").cloned();
         let cache = Cache::new()?;
-        let res = cache.exec_problem(id, Run::Submit, None).await?;
+        let res = cache.exec_problem(id, Run::Submit, None, file_path, lang).await?;
 
         println!("{}", res);
         Ok(())

@@ -54,7 +54,7 @@ impl Command for TestCommand {
             _ => None,
         };
         let cache = Cache::new()?;
-        let res = cache.exec_problem(id, Run::Test, case_str).await?;
+        let res = cache.exec_problem(id, Run::Test, case_str, None, None).await?;
 
         println!("{}", res);
         Ok(())
