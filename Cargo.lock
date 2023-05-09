@@ -963,6 +963,7 @@ dependencies = [
  "dirs",
  "env_logger",
  "keyring",
+ "lazy_static",
  "log",
  "nix 0.24.3",
  "openssl",

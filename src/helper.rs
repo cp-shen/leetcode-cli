@@ -1,6 +1,6 @@
 //! A set of helper traits
 pub use self::digit::Digit;
-pub use self::file::{code_path, load_script, test_cases_path};
+pub use self::file::{code_path, load_script, test_cases_path, get_meta_from_file};
 pub use self::filter::{filter, squash};
 pub use self::html::HTML;
 
@@ -186,6 +186,14 @@ mod file {
         }
     }
 
+    use std::{
+        fs::File,
+        io::{BufRead, BufReader},
+        path::Path,
+    };
+
+    use regex::Regex;
+
     use crate::{cache::models::Problem, Error};
 
     /// Generate test cases path by fid
@@ -225,7 +233,6 @@ mod file {
 
     /// Load python scripts
     pub fn load_script(module: &str) -> Result<String, crate::Error> {
-        use std::fs::File;
         use std::io::Read;
         let conf = crate::cfg::locate()?;
         let mut script = "".to_string();
@@ -233,5 +240,25 @@ mod file {
             .read_to_string(&mut script)?;
 
         Ok(script)
+    }
+
+    pub fn get_meta_from_file(file_path: &Path) -> Option<(i32, String)> {
+        use lazy_static::lazy_static;
+
+        lazy_static! {
+            static ref RE: Regex =
+                Regex::new(r"@lc.*id=(?<id>\d+).*lang=(?<lang>[[:alnum:]]+)").unwrap();
+        }
+
+        let lines = BufReader::new(File::open(file_path).unwrap()).lines();
+        let line = lines
+            .take(5)
+            .map(|l| l.unwrap())
+            .find(|l| l.contains("@lc"));
+        let caps = line.as_ref().map(|l| RE.captures(l).unwrap());
+        let ret = caps
+            .map(|caps| caps.name("id").zip(caps.name("lang")))
+            .flatten();
+        ret.map(|(id, lang)|{(id.as_str().parse().unwrap(), lang.as_str().to_owned())})
     }
 }
