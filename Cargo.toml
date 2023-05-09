@@ -1,5 +1,5 @@
 [[bin]]
-name = "leetcode"
+name = "lc"
 path = "src/bin/lc.rs"
 
 [package]
