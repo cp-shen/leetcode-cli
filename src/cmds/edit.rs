@@ -88,6 +88,8 @@ impl Command for EditCommand {
             let mut flag = false;
             for d in question.defs.0 {
                 if d.value == *lang {
+                    file_code.write_all(format!("{} @lc id={} lang={}\n",
+                        &conf.code.comment_leading, id, lang).as_bytes())?;
                     flag = true;
                     if conf.code.comment_problem_desc {
                         file_code.write_all(p_desc_comment.as_bytes())?;

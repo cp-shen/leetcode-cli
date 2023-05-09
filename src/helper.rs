@@ -205,7 +205,7 @@ mod file {
             conf.code.pick
         );
 
-        path = path.replace("${fid}", &problem.fid.to_string());
+        path = path.replace("${fid}", &format!("{:04}", &problem.fid));
         path = path.replace("${slug}", &problem.slug.replace("-", "_"));
         Ok(path)
     }
@@ -225,7 +225,7 @@ mod file {
             suffix(&lang)?,
         );
 
-        path = path.replace("${fid}", &problem.fid.to_string());
+        path = path.replace("${fid}", &format!("{:04}", &problem.fid));
         path = path.replace("${slug}", &problem.slug.replace("-", "_"));
 
         Ok(path)
