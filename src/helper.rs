@@ -191,10 +191,14 @@ mod file {
     /// Generate test cases path by fid
     pub fn test_cases_path(problem: &Problem) -> Result<String, Error> {
         let conf = crate::cfg::locate()?;
-        let mut path = format!("{}/{}.tests.dat", conf.storage.code()?, conf.code.pick);
+        let mut path = format!(
+            "{}/{}.tests.dat",
+            std::env::current_dir()?.to_str().unwrap(), //conf.storage.code()?,
+            conf.code.pick
+        );
 
         path = path.replace("${fid}", &problem.fid.to_string());
-        path = path.replace("${slug}", &problem.slug.replace("-","_"));
+        path = path.replace("${slug}", &problem.slug.replace("-", "_"));
         Ok(path)
     }
 
@@ -208,13 +212,13 @@ mod file {
 
         let mut path = format!(
             "{}/{}.{}",
-            conf.storage.code()?,
+            std::env::current_dir()?.to_str().unwrap(), //conf.storage.code()?,
             conf.code.pick,
             suffix(&lang)?,
         );
 
         path = path.replace("${fid}", &problem.fid.to_string());
-        path = path.replace("${slug}", &problem.slug.replace("-","_"));
+        path = path.replace("${slug}", &problem.slug.replace("-", "_"));
 
         Ok(path)
     }
